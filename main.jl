@@ -26,7 +26,7 @@ begin # Masskrugschieben
 end
 
 begin # Wackelturm
-  sort!(PktWackelturm, [order(:Hoehe, rev=true)])
+  sort!(PktWackelturm, [order(:Anzahl, rev=true)])
   println(PktWackelturm)
 end
 
