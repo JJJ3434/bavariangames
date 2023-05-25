@@ -51,11 +51,6 @@ begin # Bulldogziehen
 end
 
 begin # Bierkruglauf
-  BierkruglaufGesamt = []
-  for row in eachrow(PktBierkruglauf)
-    push!(BierkruglaufGesamt, (row[2] - row[3]) / row[4])
-  end
-  PktBierkruglauf[!, :Gesamt] = BierkruglaufGesamt
   sort!(PktBierkruglauf, [order(:Gesamt, rev=true)])
   println(PktBierkruglauf)
 end
