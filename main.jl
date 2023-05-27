@@ -85,4 +85,18 @@ begin # Gesamtauswertung
   Bestenliste = sort(Gruppen, [order(:Gesamt, rev=true)])
   println(Bestenliste)
 end
+
+# Write results to excel file
+XLSX.openxlsx("results.xlsx", mode="w") do xf
+    sheet = xf[1]
+    XLSX.rename!(sheet, "results")
+  sheet["A1"] = "GruppenID"
+  sheet["B1"] = "Gruppenname"
+  sheet["C1"] = "T1"
+  sheet["D1"] = "T2"
+  sheet["E1"] = "T3"
+  sheet["F1"] = "T4"
+  sheet["G1"] = "Pkt"
+  sheet["A2"] = Array(Bestenliste)
+end
 end
