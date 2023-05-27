@@ -22,6 +22,17 @@ begin # Masskrugschieben
   end
   PktMasskrugschieben[!, :Gesamt] = PktGesamtMKS
   sort!(PktMasskrugschieben, [order(:Gesamt, rev=true)])
+  PktMasskrugschieben[!, :Fis] .= 0
+
+  for i in 1:nrow(PktMasskrugschieben)
+    PktMasskrugschieben[i,:Fis] = FISPkt[i]
+  end
+  for i in 1:nrow(PktMasskrugschieben)-1
+    if(PktMasskrugschieben[i, :Gesamt] ==  PktMasskrugschieben[i+1, :Gesamt])
+      PktMasskrugschieben[i+1, :Fis] = PktMasskrugschieben[i, :Fis]
+    end
+  end
+
   println(PktMasskrugschieben)
 end
 
@@ -58,10 +69,12 @@ end
 
 begin # Gesamtauswertung
   Gruppen[!, :Gesamt] .= 0
+  # punkte nach fis vergeben
   for i in 1:nrow(PktMasskrugschieben)
     GruppenID = PktMasskrugschieben[i, :GruppenID]
-    Gruppen[GruppenID, :Gesamt] += FISPkt[i]
+    Gruppen[GruppenID, :Gesamt] += PktMasskrugschieben[i, :Fis]
   end
+
   for i in 1:nrow(PktWackelturm)
     GruppenID = PktWackelturm[i, :GruppenID]
     Gruppen[GruppenID, :Gesamt] += FISPkt[i]
