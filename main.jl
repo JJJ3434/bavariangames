@@ -14,6 +14,19 @@ PktBierkruglauf = DataFrame(XLSX.readtable("BavarianGames.xlsx", "PktBierkruglau
 
 FISPkt = [100 80 60 50 45 40 36 32 29 26 24 22 20 18 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1]
 
+function addLokalFIS!(Pkt::DataFrame, col::Symbol)
+  # add lokal fis points
+  Pkt[!, :Fis] .= 0
+  for i in 1:nrow(Pkt)
+    Pkt[i,:Fis] = FISPkt[i]
+  end
+  for i in 1:nrow(Pkt)-1
+    if(Pkt[i, col] ==  Pkt[i+1, col])
+      Pkt[i+1, :Fis] = Pkt[i, :Fis]
+    end
+  end
+    # return Pkt
+end
 
 begin # Masskrugschieben
   PktGesamtMKS = []
@@ -22,22 +35,18 @@ begin # Masskrugschieben
   end
   PktMasskrugschieben[!, :Gesamt] = PktGesamtMKS
   sort!(PktMasskrugschieben, [order(:Gesamt, rev=true)])
-  PktMasskrugschieben[!, :Fis] .= 0
 
-  for i in 1:nrow(PktMasskrugschieben)
-    PktMasskrugschieben[i,:Fis] = FISPkt[i]
-  end
-  for i in 1:nrow(PktMasskrugschieben)-1
-    if(PktMasskrugschieben[i, :Gesamt] ==  PktMasskrugschieben[i+1, :Gesamt])
-      PktMasskrugschieben[i+1, :Fis] = PktMasskrugschieben[i, :Fis]
-    end
-  end
+  # add lokal fis points
+  addLokalFIS!(PktMasskrugschieben, :Gesamt)
 
   println(PktMasskrugschieben)
 end
 
 begin # Wackelturm
   sort!(PktWackelturm, [order(:Anzahl, rev=true)])
+
+  addLokalFIS!(PktWackelturm, :Anzahl)
+
   println(PktWackelturm)
 end
 
@@ -48,21 +57,33 @@ begin # Holzscheitelwurf
   end
   PktHolzscheitelwurf[!, :Gesamt] = WeiteGesamtHSW
   sort!(PktHolzscheitelwurf, [order(:Gesamt, rev=true)])
+
+  addLokalFIS!(PktHolzscheitelwurf, :Gesamt)
+  
   println(PktHolzscheitelwurf)
 end
 
 begin # Reifenwuchten
   sort!(PktReifenwuchten, [order(:Zeit)])
+
+  addLokalFIS!(PktReifenwuchten, :Zeit)
+
   println(PktReifenwuchten)
 end
 
 begin # Bulldogziehen
   sort!(PktBulldogziehen, [order(:Zeit)])
+
+  addLokalFIS!(PktBulldogziehen, :Zeit)
+
   println(PktBulldogziehen)
 end
 
 begin # Bierkruglauf
   sort!(PktBierkruglauf, [order(:Gesamt, rev=true)])
+
+  addLokalFIS!(PktBierkruglauf, :Gesamt)
+
   println(PktBierkruglauf)
 end
 
@@ -77,23 +98,23 @@ begin # Gesamtauswertung
 
   for i in 1:nrow(PktWackelturm)
     GruppenID = PktWackelturm[i, :GruppenID]
-    Gruppen[GruppenID, :Gesamt] += FISPkt[i]
+    Gruppen[GruppenID, :Gesamt] += PktWackelturm[i, :Fis]
   end
   for i in 1:nrow(PktHolzscheitelwurf)
     GruppenID = PktHolzscheitelwurf[i, :GruppenID]
-    Gruppen[GruppenID, :Gesamt] += FISPkt[i]
+    Gruppen[GruppenID, :Gesamt] += PktHolzscheitelwurf[i, :Fis]
   end
   for i in 1:nrow(PktReifenwuchten)
     GruppenID = PktReifenwuchten[i, :GruppenID]
-    Gruppen[GruppenID, :Gesamt] += FISPkt[i]
+    Gruppen[GruppenID, :Gesamt] += PktReifenwuchten[i, :Fis]
   end
   for i in 1:nrow(PktBulldogziehen)
     GruppenID = PktBulldogziehen[i, :GruppenID]
-    Gruppen[GruppenID, :Gesamt] += FISPkt[i]
+    Gruppen[GruppenID, :Gesamt] += PktBulldogziehen[i, :Fis]
   end
   for i in 1:nrow(PktBierkruglauf)
     GruppenID = PktBierkruglauf[i, :GruppenID]
-    Gruppen[GruppenID, :Gesamt] += FISPkt[i]
+    Gruppen[GruppenID, :Gesamt] += PktBierkruglauf[i, :Fis]
   end
   Bestenliste = sort(Gruppen, [order(:Gesamt, rev=true)])
   println(Bestenliste)
